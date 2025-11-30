@@ -19,25 +19,21 @@
 
 
 
-// Define triangle vertices
+// Define square vertices
   GLfloat vertices[] = {
-//              COORDINATES                        ||         COLORS
-//------------------------------------------------------------------------
-//     X   |               Y               |  Z    ||    R   |  G   |  B  |
-//------------------------------------------------------------------------
-     -0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f,  // 0: Lower left
-      0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f,  // 1: Lower right
-      0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,       1.0f, 0.6f,  0.32f,  // 2: Up
-    -0.25f,  0.5f * float(sqrt(3)) / 6,     0.0f,       0.9f, 0.45f, 0.17f,  // 3: Inner left
-     0.25f,  0.5f * float(sqrt(3)) / 6,     0.0f,       0.9f, 0.45f, 0.17f,  // 4: Inner right
-      0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f   // 5: Inner down
+//      COORDINATES       ||       COLORS       ||   TEXTURE COORDINATES  
+//------------------------||--------------------||-------------------------
+//    X   |  Y  |  Z      ||    R  |  G  | B    ||   X  |  Y
+    -0.5f, -0.5f, 0.0f,       1.0f, 0.0f, 0.0f,     0.0f, 0.0f, // 0: Lower left corner
+     0.5f, -0.5f, 0.0f,       0.0f, 1.0f, 0.0f,     1.0f, 0.0f, // 1: Lower right corner
+     0.5f,  0.5f, 0.0f,       0.0f, 0.0f, 1.0f,     1.0f, 1.0f, // 2: Upper right corner
+    -0.5f,  0.5f, 0.0f,       1.0f, 1.0f, 1.0f,     0.0f, 1.0f  // 3: Upper left corner
   };
 
   // Define order to draw triangles
   GLuint indicies[] = {
-    0, 5, 3, // Lower left triangle
-    5, 1, 4, // Lower right triangle
-    3, 4, 2 // Top triangle
+    0, 1, 2, // Lower right triangle
+    2, 3, 0  // Upper left triangle
   };
 
 
@@ -89,8 +85,9 @@ int main(void) {
   IndexBuffer ibo(indicies, sizeof(indicies));
 
   // Apply vbo configuration to vao
-  vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
   
   // Unbind each object before program loop
   vao.Unbind();
@@ -101,6 +98,39 @@ int main(void) {
 
   // Get uniform location from shader program
   GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), "scale");
+
+
+
+  // Load in pop cat texture with stb_image
+  int imgWidth, imgHeight, imgNumColorChannels;
+  std::string imgFilePath = RESOURCES_PATH "textures/pop_cat.png";
+  stbi_set_flip_vertically_on_load(true);
+  unsigned char* imgBytes = stbi_load(imgFilePath.c_str(), &imgWidth, &imgHeight, &imgNumColorChannels, 0);
+
+  // Assign pop cat texture to OpenGl texture
+  GLuint texture;
+  glGenTextures(1, &texture);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+  // glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBytes);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  stbi_image_free(imgBytes);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  GLuint uniTex0 = glGetUniformLocation(shaderProgram.GetID(), "tex0");
+  shaderProgram.Activate();
+  glUniform1i(uniTex0, 0);
 
 
 
@@ -115,11 +145,13 @@ int main(void) {
     // Provide value to shader uniform
     glUniform1f(uniID, 0.5f);
 
+    glBindTexture(GL_TEXTURE_2D, texture);
+
     // Bind vao with triangle vertex/index values
     vao.Bind();
 
     // Draw triangle
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers
     glfwSwapBuffers(window);
@@ -134,6 +166,7 @@ int main(void) {
   vao.Delete();
   vbo.Delete();
   ibo.Delete();
+  glDeleteTextures(1, &texture);
   shaderProgram.Delete();
 
   // Cleanup GLFW window object
