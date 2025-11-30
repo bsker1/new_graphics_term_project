@@ -8,7 +8,7 @@ class VertexBuffer {
     GLuint id;
   
   public:
-    VertexBuffer(GLfloat* verticies, GLsizeiptr size);
+    VertexBuffer(const GLfloat* vertices, const GLsizeiptr size);
 
     void Bind();
     void Unbind();

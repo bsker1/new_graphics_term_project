@@ -11,7 +11,7 @@ class VertexArray {
   public:
     VertexArray();
 
-    void LinkVertexBuffer(VertexBuffer vbo, GLuint layout);
+    void LinkVertexBuffer(VertexBuffer vbo, const GLuint layout);
     void Bind();
     void Unbind();
     void Delete();

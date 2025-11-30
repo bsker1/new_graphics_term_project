@@ -7,45 +7,13 @@
 #include <fstream>
 
 #include "Shader.h"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 
 
-int main(void) {
-  GLFWwindow* window;
-
-  // Initialize GLFW
-  if (!glfwInit()) {
-    return -1;
-  }
-
-  // Configure GLFW for OpenGL 3.3 core
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  // Create a windowed mode window and its OpenGL context
-  window = glfwCreateWindow(800, 800, "Graphics Term Project - Brandon Kiser", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
-
-  // Make the window's context current
-  glfwMakeContextCurrent(window);
-
-  // Initialize GLAD 
-  gladLoadGL();
-
-
-  
-  // Generate shader program from default shader files
-  std::string vertexPath = RESOURCES_PATH "shaders/default.vert";
-  std::string fragmentPath = RESOURCES_PATH "shaders/default.frag";
-  Shader shaderProgram(vertexPath, fragmentPath);
-
-
-
-  // Define triangle vertices
+// Define triangle vertices
   GLfloat vertices[] = {
     -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 0: Lower left
     0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 1: Lower right
@@ -64,33 +32,54 @@ int main(void) {
 
 
 
-  // Configure vertex array, vertex buffer, and index buffer objects
-  GLuint vao, vbo, ibo;
-  glGenVertexArrays(1, &vao);
-  glGenBuffers(1, &vbo);
-  glGenBuffers(1, &ibo);
+int main(void) {
+  GLFWwindow* window;
 
-  // Bind vao
-  glBindVertexArray(vao);
+  // Initialize GLFW
+  if (!glfwInit()) {
+    return -1;
+  }
 
-  // Bind vbo
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  // Apply verticies array to vbo
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  // Configure GLFW for OpenGL 3.3 core
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  // Bind ibo
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  // Apply indicies array to ibo
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+  // Create a windowed mode window and its OpenGL context
+  window = glfwCreateWindow(800, 800, "Graphics Term Project - Brandon Kiser", NULL, NULL);
+  if (!window) {
+    glfwTerminate();
+    return -1;
+  }
 
-  // Define layout of vbo data
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
+  // Make the window's context current
+  glfwMakeContextCurrent(window);
 
-  // Unbind objects for cleanup
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  // Initialize GLAD 
+  gladLoadGL();
+
+  // Define OpenGl viewport to size of window
+  glViewport(0, 0, 800, 800);
+
+
+
+  // Generate shader program from default shader files
+  std::string vertexPath = RESOURCES_PATH "shaders/default.vert";
+  std::string fragmentPath = RESOURCES_PATH "shaders/default.frag";
+  Shader shaderProgram(vertexPath, fragmentPath);
+
+
+
+  VertexArray vao;
+  vao.Bind();
+
+  VertexBuffer vbo(vertices, sizeof(vertices));
+  IndexBuffer ibo(indicies, sizeof(indicies));
+
+  vao.LinkVertexBuffer(vbo, 0);
+  vao.Unbind();
+  vbo.Unbind();
+  ibo.Unbind();
 
 
 
@@ -102,7 +91,7 @@ int main(void) {
 
     // Select shader program and vao
     shaderProgram.Activate();
-    glBindVertexArray(vao);
+    vao.Bind();
 
     // Draw triangle
     glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
@@ -117,9 +106,9 @@ int main(void) {
 
 
   // Cleanup objects from memory
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vbo);
-  glDeleteBuffers(1, &ibo);
+  vao.Delete();
+  vbo.Delete();
+  ibo.Delete();
   shaderProgram.Delete();
 
   // Cleanup GLFW window object
