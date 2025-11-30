@@ -91,9 +91,15 @@ int main(void) {
   vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
   vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
   
+  // Unbind each object before program loop
   vao.Unbind();
   vbo.Unbind();
   ibo.Unbind();
+
+
+
+  // Get uniform location from shader program
+  GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), "scale");
 
 
 
@@ -103,8 +109,12 @@ int main(void) {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Select shader program and vao
+    // Select shader program
     shaderProgram.Activate();
+    // Provide value to shader uniform
+    glUniform1f(uniID, 0.5f);
+
+    // Bind vao with triangle vertex/index values
     vao.Bind();
 
     // Draw triangle
