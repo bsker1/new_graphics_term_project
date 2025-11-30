@@ -52,17 +52,15 @@ int main(void) {
 
   // Apply vertex shader source code to OpenGL shader
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  std::string vertexShaderSource = readFile(RESOURCES_PATH "shaders/Vertex.shader");
+  std::string vertexShaderSource = readFile(RESOURCES_PATH "shaders/default.vert");
   const char* vertexSrc = vertexShaderSource.c_str();
-  std::cout << "{start}" << vertexShaderSource << "{end}" << std::endl;
   glShaderSource(vertexShader, 1, &vertexSrc, NULL);
   glCompileShader(vertexShader);
 
   // Apply fragment shader source code to OpenGL shader
   GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  std::string fragmentShaderSource = readFile(RESOURCES_PATH "shaders/Fragment.shader");
+  std::string fragmentShaderSource = readFile(RESOURCES_PATH "shaders/default.frag");
   const char* fragmentSrc = fragmentShaderSource.c_str();
-  std::cout << "{start}" << fragmentShaderSource << "{end}" << std::endl;
   glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
   glCompileShader(fragmentShader);
 
