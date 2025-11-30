@@ -14,7 +14,7 @@ std::string readFile(const std::string &filePath) {
   return fileContents;
 }
 
-Shader::Shader(const char* vertexFile, const char* fragmentFile) {
+Shader::Shader(const std::string vertexFile, const std::string fragmentFile) {
   // get vertex shader source code into char array
   std::string vertexContents = readFile(vertexFile);
   const char* vertexSource = vertexContents.c_str();

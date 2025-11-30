@@ -37,30 +37,11 @@ int main(void) {
   gladLoadGL();
 
 
-
-  // Apply vertex shader source code to OpenGL shader
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  std::string vertexShaderSource = readFile(RESOURCES_PATH "shaders/default.vert");
-  const char* vertexSrc = vertexShaderSource.c_str();
-  glShaderSource(vertexShader, 1, &vertexSrc, NULL);
-  glCompileShader(vertexShader);
-
-  // Apply fragment shader source code to OpenGL shader
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  std::string fragmentShaderSource = readFile(RESOURCES_PATH "shaders/default.frag");
-  const char* fragmentSrc = fragmentShaderSource.c_str();
-  glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
-  glCompileShader(fragmentShader);
-
-  // Link shaders to OpenGL program
-  GLuint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-
-  // Cleanup shaders after linking
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  
+  // Generate shader program from default shader files
+  std::string vertexPath = RESOURCES_PATH "shaders/default.vert";
+  std::string fragmentPath = RESOURCES_PATH "shaders/default.frag";
+  Shader shaderProgram(vertexPath, fragmentPath);
 
 
 
@@ -120,7 +101,7 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Select shader program and vao
-    glUseProgram(shaderProgram);
+    shaderProgram.Activate();
     glBindVertexArray(vao);
 
     // Draw triangle
@@ -139,7 +120,7 @@ int main(void) {
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
   glDeleteBuffers(1, &ibo);
-  glDeleteProgram(shaderProgram);
+  shaderProgram.Delete();
 
   // Cleanup GLFW window object
   glfwDestroyWindow(window);
