@@ -6,19 +6,7 @@
 #include <string>
 #include <fstream>
 
-
-
-// Output file contents given a file path
-static std::string readFile(const std::string &filePath) {
-  std::ifstream stream(filePath);
-  std::string currentLine;
-  std::string fileContents;
-  while (getline(stream, currentLine)) {
-    fileContents += currentLine + '\n';
-  }
-
-  return fileContents;
-}
+#include "Shader.h"
 
 
 

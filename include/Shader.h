@@ -5,7 +5,7 @@
 
 #include <string>
 
-static std::string readFile(const std::string &filePath);
+std::string readFile(const std::string &filePath);
 
 class Shader {
   private:
