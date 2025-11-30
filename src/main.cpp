@@ -11,6 +11,9 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
+#define RESOLUTION_X 800
+#define RESOLUTION_Y 800
+
 
 
 // Define triangle vertices
@@ -46,7 +49,7 @@ int main(void) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Create a windowed mode window and its OpenGL context
-  window = glfwCreateWindow(800, 800, "Graphics Term Project - Brandon Kiser", NULL, NULL);
+  window = glfwCreateWindow(RESOLUTION_X, RESOLUTION_Y, "Graphics Term Project - Brandon Kiser", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -59,7 +62,7 @@ int main(void) {
   gladLoadGL();
 
   // Define OpenGl viewport to size of window
-  glViewport(0, 0, 800, 800);
+  glViewport(0, 0, RESOLUTION_X, RESOLUTION_Y);
 
 
 
@@ -70,13 +73,17 @@ int main(void) {
 
 
 
+  // Instantiate vao
   VertexArray vao;
   vao.Bind();
 
+  // Instantiate vbo and ibo
   VertexBuffer vbo(vertices, sizeof(vertices));
   IndexBuffer ibo(indicies, sizeof(indicies));
 
+  // Apply vbo configuration to vao
   vao.LinkVertexBuffer(vbo, 0);
+  
   vao.Unbind();
   vbo.Unbind();
   ibo.Unbind();
