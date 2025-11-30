@@ -4,10 +4,10 @@ VertexArray::VertexArray() {
   glGenVertexArrays(1, &id);
 }
 
-void VertexArray::LinkVertexBuffer(VertexBuffer vbo, const GLuint layout) {
+void VertexArray::LinkAttrib(VertexBuffer vbo, const GLuint layout, const GLuint numComponents, const GLenum type, const GLsizeiptr stride, const void* offset) {
   vbo.Bind();
   // Define layout of vbo data
-  glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
   glEnableVertexAttribArray(layout);
   vbo.Unbind();
 }

@@ -11,6 +11,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
+
+
 #define RESOLUTION_X 800
 #define RESOLUTION_Y 800
 
@@ -18,12 +20,16 @@
 
 // Define triangle vertices
   GLfloat vertices[] = {
-    -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 0: Lower left
-    0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 1: Lower right
-    0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // 2: Up
-    -0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // 3: Inner left
-    0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // 4: Inner right
-    0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // 5: Inner down
+//              COORDINATES                        ||         COLORS
+//------------------------------------------------------------------------
+//     X   |               Y               |  Z    ||    R   |  G   |  B  |
+//------------------------------------------------------------------------
+     -0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f,  // 0: Lower left
+      0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f,  // 1: Lower right
+      0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,       1.0f, 0.6f,  0.32f,  // 2: Up
+    -0.25f,  0.5f * float(sqrt(3)) / 6,     0.0f,       0.9f, 0.45f, 0.17f,  // 3: Inner left
+     0.25f,  0.5f * float(sqrt(3)) / 6,     0.0f,       0.9f, 0.45f, 0.17f,  // 4: Inner right
+      0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,       0.8f, 0.3f,  0.02f   // 5: Inner down
   };
 
   // Define order to draw triangles
@@ -82,7 +88,8 @@ int main(void) {
   IndexBuffer ibo(indicies, sizeof(indicies));
 
   // Apply vbo configuration to vao
-  vao.LinkVertexBuffer(vbo, 0);
+  vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
   
   vao.Unbind();
   vbo.Unbind();
