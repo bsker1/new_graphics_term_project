@@ -80,23 +80,41 @@ int main(void) {
 
   // Define triangle vertices
   GLfloat vertices[] = {
-    -0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,
-     0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,
-     0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f
+    -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 0: Lower left
+    0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // 1: Lower right
+    0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // 2: Up
+    -0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // 3: Inner left
+    0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // 4: Inner right
+    0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // 5: Inner down
+  };
+
+  // Define order to draw triangles
+  GLuint indicies[] = {
+    0, 5, 3, // Lower left triangle
+    5, 1, 4, // Lower right triangle
+    3, 4, 2 // Top triangle
   };
 
 
 
-  // Configure vertex array and vertex buffer objects
-  GLuint vao, vbo;
+  // Configure vertex array, vertex buffer, and index buffer objects
+  GLuint vao, vbo, ibo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
+  glGenBuffers(1, &ibo);
 
-  // Bind objects
+  // Bind vao
   glBindVertexArray(vao);
+
+  // Bind vbo
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   // Apply verticies array to vbo
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // Bind ibo
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  // Apply indicies array to ibo
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
   // Define layout of vbo data
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -105,6 +123,7 @@ int main(void) {
   // Unbind objects for cleanup
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 
@@ -119,7 +138,7 @@ int main(void) {
     glBindVertexArray(vao);
 
     // Draw triangle
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers
     glfwSwapBuffers(window);
@@ -133,6 +152,7 @@ int main(void) {
   // Cleanup objects from memory
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
+  glDeleteBuffers(1, &ibo);
   glDeleteProgram(shaderProgram);
 
   // Cleanup GLFW window object
