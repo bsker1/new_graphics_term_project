@@ -11,6 +11,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "Texture.h"
 
 
 
@@ -96,41 +97,16 @@ int main(void) {
 
 
 
+  // Load pop cat image into OpenGL texture
+  std::string imgFilePath = RESOURCES_PATH "textures/pop_cat.png";
+  Texture popCat(imgFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
+  // Apply value to tex0 uniform in fragment shader
+  popCat.TexUnit(shaderProgram, "tex0", 0);
+
+
+
   // Get uniform location from shader program
   GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), "scale");
-
-
-
-  // Load in pop cat texture with stb_image
-  int imgWidth, imgHeight, imgNumColorChannels;
-  std::string imgFilePath = RESOURCES_PATH "textures/pop_cat.png";
-  stbi_set_flip_vertically_on_load(true);
-  unsigned char* imgBytes = stbi_load(imgFilePath.c_str(), &imgWidth, &imgHeight, &imgNumColorChannels, 0);
-
-  // Assign pop cat texture to OpenGl texture
-  GLuint texture;
-  glGenTextures(1, &texture);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  // float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-  // glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgBytes);
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  stbi_image_free(imgBytes);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
-  GLuint uniTex0 = glGetUniformLocation(shaderProgram.GetID(), "tex0");
-  shaderProgram.Activate();
-  glUniform1i(uniTex0, 0);
 
 
 
@@ -145,7 +121,8 @@ int main(void) {
     // Provide value to shader uniform
     glUniform1f(uniID, 0.5f);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
+    // Bind texture with pop cat image
+    popCat.Bind();
 
     // Bind vao with triangle vertex/index values
     vao.Bind();
@@ -166,7 +143,7 @@ int main(void) {
   vao.Delete();
   vbo.Delete();
   ibo.Delete();
-  glDeleteTextures(1, &texture);
+  popCat.Delete();
   shaderProgram.Delete();
 
   // Cleanup GLFW window object
