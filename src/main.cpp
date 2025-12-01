@@ -21,7 +21,7 @@
 
 #define RESOLUTION_X 800
 #define RESOLUTION_Y 800
-#define FPS 144
+#define FPS 60
 
 
 
@@ -133,6 +133,7 @@ int main(void) {
     // Select shader program
     shaderProgram.Activate();
 
+    camera.Inputs(window);
     camera.Matrix(45.0f, RESOLUTION_X / (float)RESOLUTION_Y, 0.1f, 100.0f,
       shaderProgram, "camMatrix");
 
