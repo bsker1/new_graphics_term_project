@@ -17,6 +17,8 @@ class Camera {
     glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    bool firstClick = true;
+
     int width;
     int height;
 

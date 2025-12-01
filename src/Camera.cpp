@@ -22,12 +22,15 @@ void Camera::Matrix(const float yFovDegree, const float aspect,
 }
 
 void Camera::Inputs(GLFWwindow* window) {
+  // Hold shift to control movement speed
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
     speed = 0.1f;
-  } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+  }
+  else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
     speed = 0.01f;
   }
 
+  // WASD to move forward/back, strafe left/right
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     position += speed * orientation;
   }
@@ -44,10 +47,53 @@ void Camera::Inputs(GLFWwindow* window) {
       glm::cross(orientation, upDirection)
     );
   }
+  // Space/ctrl to move up/down respectively
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     position += speed * upDirection;
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
     position += speed * -upDirection;
+  }
+
+  // Check if left mouse button is pressed
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    // Hide cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+    // Set cursor to middle of screen on click
+    if (firstClick) {
+      glfwSetCursorPos(window, width / 2, height / 2);
+      firstClick = false;
+    }
+
+    // Get cursor coordinates
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    // Set rotation angles based on mouse movement
+    float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
+    float rotY = sensitivity * (float)(mouseX - (height / 2)) / height;
+
+    // Set new orientation to mouse rotation on current orientation
+    glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX),
+      glm::normalize(glm::cross(orientation, upDirection)));
+    
+    // Apply rotX rotation if within 5 degrees
+    if (!((glm::angle(newOrientation, upDirection) <= glm::radians(5.0f)) or
+      (glm::angle(newOrientation, -upDirection) <= glm::radians(5.0f)))) {
+        orientation = newOrientation;
+    }
+
+    // Apply rotY rotation
+    orientation = glm::rotate(orientation, glm::radians(-rotY), upDirection);
+
+    // Reposition cursor to middle of screen
+    glfwSetCursorPos(window, width / 2, height / 2);
+  }
+  else if (glfwGetMouseButton(window,
+    GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+      // Show cursor on release
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      firstClick = true;
   }
 }
