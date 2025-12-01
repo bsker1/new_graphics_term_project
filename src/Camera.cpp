@@ -10,13 +10,18 @@ Camera::Camera(const int inWidth, const int inHeight,
 void Camera::Matrix(const float yFovDegree, const float aspect,
   const float nearPlane, const float farPlane, Shader& shaderProgram,
   const char* uniform) {
+    // Initialize view and projection matrices
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj = glm::mat4(1.0f);
 
+    // Define view matrix with positional vectors
     view = glm::lookAt(position, position + orientation, upDirection);
+    // Define projection matrix with provided worldview properties
     proj = glm::perspective(glm::radians(yFovDegree), aspect, nearPlane,
       farPlane);
     
+    // Apply projection and view matrix to provided uniform for
+    // vertex shader
     GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), uniform);
     glUniformMatrix4fv(uniID, 1, GL_FALSE, glm::value_ptr(proj * view));
 }
