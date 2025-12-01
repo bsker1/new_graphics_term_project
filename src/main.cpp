@@ -20,29 +20,33 @@
 
 #define RESOLUTION_X 800
 #define RESOLUTION_Y 800
+#define FPS 144
 
 
 
-// Define square vertices
-  GLfloat vertices[] = {
-//      COORDINATES       ||       COLORS       ||   TEXTURE COORDINATES  
-//------------------------||--------------------||-------------------------
-//    X   |  Y  |  Z      ||    R  |  G  | B    ||   X  |  Y
-    -0.5f, -0.5f, 0.0f,       1.0f, 0.0f, 0.0f,     0.0f, 0.0f, // 0: Lower left corner
-     0.5f, -0.5f, 0.0f,       0.0f, 1.0f, 0.0f,     1.0f, 0.0f, // 1: Lower right corner
-     0.5f,  0.5f, 0.0f,       0.0f, 0.0f, 1.0f,     1.0f, 1.0f, // 2: Upper right corner
-    -0.5f,  0.5f, 0.0f,       1.0f, 1.0f, 1.0f,     0.0f, 1.0f  // 3: Upper left corner
-  };
+// Define pyramid vertices
+GLfloat vertices[] = {
+  -0.5f, 0.0f,  0.5f,    0.83f, 0.70f, 0.44f,      0.0f, 0.0f,
+   0.5f, 0.0f,  0.5f,    0.83f, 0.70f, 0.44f,      5.0f, 0.0f,
+   0.5f, 0.0f, -0.5f,    0.83f, 0.70f, 0.44f,      0.0f, 0.0f,
+  -0.5f, 0.0f, -0.5f,    0.83f, 0.70f, 0.44f,      5.0f, 0.0f,
+   0.0f, 0.8f,  0.0f,    0.92f, 0.86f, 0.76f,      2.5f, 5.0f
+};
 
-  // Define order to draw triangles
-  GLuint indicies[] = {
-    0, 1, 2, // Lower right triangle
-    2, 3, 0  // Upper left triangle
-  };
+// Define order to draw triangles
+GLuint indicies[] = {
+  0, 1, 2,
+  2, 3, 0,
+  0, 1, 4,
+  1, 2, 4,
+  2, 3, 4,
+  3, 0, 4
+};
 
 
 
 int main(void) {
+  // Create GLFW windo object
   GLFWwindow* window;
 
   // Initialize GLFW
@@ -81,11 +85,11 @@ int main(void) {
 
 
 
-  // Instantiate vao
+  // Create vao
   VertexArray vao;
   vao.Bind();
 
-  // Instantiate vbo and ibo
+  // Create vbo and ibo, load with vertices and indicies respectively
   VertexBuffer vbo(vertices, sizeof(vertices));
   IndexBuffer ibo(indicies, sizeof(indicies));
 
@@ -103,38 +107,67 @@ int main(void) {
 
 
 
-  // Load pop cat image into OpenGL texture
-  std::string imgFilePath = RESOURCES_PATH "textures/pop_cat.png";
-  Texture popCat(imgFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
+  // Load brick image into OpenGL texture
+  std::string imgFilePath = RESOURCES_PATH "textures/brick.png";
+  Texture brick(imgFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
   // Apply value to tex0 uniform in fragment shader
-  popCat.TexUnit(shaderProgram, "tex0", 0);
+  brick.TexUnit(shaderProgram, "tex0", 0);
 
 
 
-  // Get uniform location from shader program
-  GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), "scale");
+  // Create pyramid rotation variables
+  float rotation = 0.0f;
+  double prevTime = glfwGetTime();
 
-
+  // Only print unobstructed triangles
+  glEnable(GL_DEPTH_TEST);
 
   // Loop until the user closes the window
   while (!glfwWindowShouldClose(window)) {
     // Clear screen to navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Select shader program
     shaderProgram.Activate();
-    // Provide value to shader uniform
-    glUniform1f(uniID, 0.5f);
 
-    // Bind texture with pop cat image
-    popCat.Bind();
+    // Create transformation matrices, initialize to fill with 1.0
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 proj = glm::mat4(1.0f);
 
-    // Bind vao with triangle vertex/index values
+    // Iterate rotation by 0.5 degrees each frame
+    double currTime = glfwGetTime();
+    if (currTime - prevTime >= 1 / (double)FPS) {
+      rotation += 0.5f;
+      prevTime = currTime;
+    }
+    // Apply rotation on y-axis
+    model = glm::rotate(model, glm::radians(rotation),
+      glm::vec3(0.0f, 1.0f, 0.0f));
+    // Move world down 0.5 and back 2.0
+    view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+    // Apply perspective yfov = 45 degrees, window aspect ratio,
+    // near clipping plane 0.1, far clipping plane 100.0
+    proj = glm::perspective(glm::radians(45.0f),
+      (float)RESOLUTION_X / RESOLUTION_Y, 0.1f, 100.0f);
+    
+    // Load matrix uniforms in shader with calculated matrices
+    GLuint uniModel = glGetUniformLocation(shaderProgram.GetID(), "model");
+    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+    GLuint uniView = glGetUniformLocation(shaderProgram.GetID(), "view");
+    glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+    GLuint uniProj = glGetUniformLocation(shaderProgram.GetID(), "proj");
+    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+
+    // Bind brick texture
+    brick.Bind();
+
+    // Bind vao with vertex/index values
     vao.Bind();
 
-    // Draw triangle
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // Draw pyramid
+    glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers
     glfwSwapBuffers(window);
@@ -149,7 +182,7 @@ int main(void) {
   vao.Delete();
   vbo.Delete();
   ibo.Delete();
-  popCat.Delete();
+  brick.Delete();
   shaderProgram.Delete();
 
   // Cleanup GLFW window object
