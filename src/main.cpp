@@ -116,9 +116,10 @@ int main(void) {
 
 
 
-  // Create pyramid rotation variables
-  float rotation = 0.0f;
-  double prevTime = glfwGetTime();
+  // Create camera object with screen resolution and starting position
+  Camera camera(RESOLUTION_X, RESOLUTION_Y, glm::vec3(0.0f, 0.0f, 2.0f));
+
+
 
   // Only print unobstructed triangles
   glEnable(GL_DEPTH_TEST);
@@ -132,34 +133,8 @@ int main(void) {
     // Select shader program
     shaderProgram.Activate();
 
-    // Create transformation matrices, initialize to fill with 1.0
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 proj = glm::mat4(1.0f);
-
-    // Iterate rotation by 0.5 degrees each frame
-    double currTime = glfwGetTime();
-    if (currTime - prevTime >= 1 / (double)FPS) {
-      rotation += 0.5f;
-      prevTime = currTime;
-    }
-    // Apply rotation on y-axis
-    model = glm::rotate(model, glm::radians(rotation),
-      glm::vec3(0.0f, 1.0f, 0.0f));
-    // Move world down 0.5 and back 2.0
-    view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-    // Apply perspective yfov = 45 degrees, window aspect ratio,
-    // near clipping plane 0.1, far clipping plane 100.0
-    proj = glm::perspective(glm::radians(45.0f),
-      (float)RESOLUTION_X / RESOLUTION_Y, 0.1f, 100.0f);
-    
-    // Load matrix uniforms in shader with calculated matrices
-    GLuint uniModel = glGetUniformLocation(shaderProgram.GetID(), "model");
-    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
-    GLuint uniView = glGetUniformLocation(shaderProgram.GetID(), "view");
-    glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
-    GLuint uniProj = glGetUniformLocation(shaderProgram.GetID(), "proj");
-    glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+    camera.Matrix(45.0f, RESOLUTION_X / (float)RESOLUTION_Y, 0.1f, 100.0f,
+      shaderProgram, "camMatrix");
 
     // Bind brick texture
     brick.Bind();
@@ -168,7 +143,8 @@ int main(void) {
     vao.Bind();
 
     // Draw pyramid
-    glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(GLuint),
+      GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers
     glfwSwapBuffers(window);

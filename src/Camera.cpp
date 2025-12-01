@@ -1,5 +1,12 @@
 #include "Camera.h"
 
+Camera::Camera(const int inWidth, const int inHeight,
+  const glm::vec3 inPostition) {
+    width = inWidth;
+    height = inHeight;
+    position = inPostition;
+}
+
 void Camera::Matrix(const float yFovDegree, const float aspect,
   const float nearPlane, const float farPlane, Shader& shaderProgram,
   const char* uniform) {

@@ -24,8 +24,8 @@ class Camera {
     float sensitivity = 100.0f;
 
   public:
-    Camera(const int width, const int height, const glm::vec3 postition)
-      : width(width), height(height), position(position) {}
+    Camera(const int inWidth, const int inHeight,
+      const glm::vec3 inPostition);
     
     void Matrix(const float yFovDegree, const float aspect,
       const float nearPlane, const float farPlane, Shader& shaderProgram,
