@@ -53,7 +53,8 @@ int main(void) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Create a windowed mode window and its OpenGL context
-  window = glfwCreateWindow(RESOLUTION_X, RESOLUTION_Y, "Graphics Term Project - Brandon Kiser", NULL, NULL);
+  window = glfwCreateWindow(RESOLUTION_X, RESOLUTION_Y,
+    "Graphics Term Project - Brandon Kiser", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -87,8 +88,10 @@ int main(void) {
 
   // Apply vbo configuration to vao
   vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float),
+    (void*)(3 * sizeof(float)));
+  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float),
+    (void*)(6 * sizeof(float)));
   
   // Unbind each object before program loop
   vao.Unbind();
