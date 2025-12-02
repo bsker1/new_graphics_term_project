@@ -35,13 +35,41 @@ GLfloat vertices[] = {
 };
 
 // Define order to draw triangles
-GLuint indicies[] = {
+GLuint indices[] = {
   0, 1, 2,
   2, 3, 0,
   0, 1, 4,
   1, 2, 4,
   2, 3, 4,
   3, 0, 4
+};
+
+
+
+GLfloat lightVertices[] = {
+  -0.1f, -0.1f,  0.1f,
+   0.1f, -0.1f,  0.1f,
+   0.1f, -0.1f, -0.1f,
+  -0.1f, -0.1f, -0.1f,
+  -0.1f,  0.1f,  0.1f,
+   0.1f,  0.1f,  0.1f,
+   0.1f,  0.1f, -0.1f,
+  -0.1f,  0.1f, -0.1f,
+};
+
+GLuint lightIndices[] = {
+  0, 1, 2,
+  2, 3, 0,
+  0, 1, 5,
+  5, 4, 0,
+  1, 2, 6,
+  6, 5, 1,
+  2, 3, 7,
+  7, 6, 2,
+  3, 0, 4,
+  4, 7, 3,
+  4, 5, 6,
+  6, 7, 4
 };
 
 
@@ -84,15 +112,13 @@ int main(void) {
   std::string fragmentPath = RESOURCES_PATH "shaders/default.frag";
   Shader shaderProgram(vertexPath, fragmentPath);
 
-
-
   // Create vao
   VertexArray vao;
   vao.Bind();
 
-  // Create vbo and ibo, load with vertices and indicies respectively
+  // Create vbo and ibo, load with vertices and indices respectively
   VertexBuffer vbo(vertices, sizeof(vertices));
-  IndexBuffer ibo(indicies, sizeof(indicies));
+  IndexBuffer ibo(indices, sizeof(indices));
 
   // Apply vbo configuration to vao
   vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
@@ -106,8 +132,6 @@ int main(void) {
   vbo.Unbind();
   ibo.Unbind();
 
-
-
   // Load brick image into OpenGL texture
   std::string imgFilePath = RESOURCES_PATH "textures/brick.png";
   Texture brick(imgFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
@@ -116,10 +140,50 @@ int main(void) {
 
 
 
+  std::string lightVertexPath = RESOURCES_PATH "shaders/light.vert";
+  std::string lightFragmentPath = RESOURCES_PATH "shaders/light.frag";
+  Shader lightShaderProgram(lightVertexPath, lightFragmentPath);
+
+  VertexArray lightVAO;
+  lightVAO.Bind();
+
+  VertexBuffer lightVBO(lightVertices, sizeof(lightVertices));
+  IndexBuffer lightIBO(lightIndices, sizeof(lightIndices));
+
+  lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(GL_FLOAT),
+    (void*)0);
+  
+  lightVAO.Unbind();
+  lightVBO.Unbind();
+  lightIBO.Unbind();
+
+
+
+  glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::mat4 lightModel = glm::mat4(1.0f);
+  lightModel = glm::translate(lightModel, lightPos);
+
+  glm::vec3 pyramidPos = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::mat4 pyramidModel = glm::mat4(1.0f);
+  pyramidModel = glm::translate(pyramidModel, pyramidPos);
+
+
+
+  lightShaderProgram.Activate();
+  GLuint uniLightModel = glGetUniformLocation(lightShaderProgram.GetID(),
+    "model");
+  glUniformMatrix4fv(uniLightModel, 1, GL_FALSE,
+    glm::value_ptr(lightModel));
+
+  shaderProgram.Activate();
+  GLuint uniPyramidModel = glGetUniformLocation(shaderProgram.GetID(),
+    "model");
+  glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE,
+    glm::value_ptr(pyramidModel));
+
+
   // Create camera object with screen resolution and starting position
   Camera camera(RESOLUTION_X, RESOLUTION_Y, glm::vec3(0.0f, 0.0f, 2.0f));
-
-
 
   // Only print unobstructed triangles
   glEnable(GL_DEPTH_TEST);
@@ -130,14 +194,14 @@ int main(void) {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Select shader program
-    shaderProgram.Activate();
-
     camera.Inputs(window);
     
     camera.UpdateMatrix(45.0f, RESOLUTION_X / (float)RESOLUTION_Y,
       0.1f, 100.0f);
-    camera.SetUniform(shaderProgram, "camMatrix");
+
+    // Select shader program
+    shaderProgram.Activate();
+    camera.SetMatrix(shaderProgram, "camMatrix");
 
     // Bind brick texture
     brick.Bind();
@@ -146,7 +210,13 @@ int main(void) {
     vao.Bind();
 
     // Draw pyramid
-    glDrawElements(GL_TRIANGLES, sizeof(indicies) / sizeof(GLuint),
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint),
+      GL_UNSIGNED_INT, 0);
+    
+    lightShaderProgram.Activate();
+    camera.SetMatrix(lightShaderProgram, "camMatrix");
+    lightVAO.Bind();
+    glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(GLuint),
       GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers

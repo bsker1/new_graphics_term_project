@@ -32,7 +32,7 @@ class Camera {
     
     void UpdateMatrix(const float yFovDegree, const float aspect,
       const float nearPlane, const float farPlane);
-    void SetUniform(Shader& shaderProgram, const char* uniform);
+    void SetMatrix(Shader& shaderProgram, const char* uniform);
     void Inputs(GLFWwindow* window);
 };
 

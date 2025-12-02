@@ -22,7 +22,7 @@ void Camera::UpdateMatrix(const float yFovDegree, const float aspect,
     cameraMatrix = proj * view;
 }
 
-void Camera::SetUniform(Shader& shaderProgram, const char* uniform) {
+void Camera::SetMatrix(Shader& shaderProgram, const char* uniform) {
     // Apply projection and view matrix to provided uniform for
     // vertex shader
     GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), uniform);
