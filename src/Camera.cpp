@@ -7,9 +7,8 @@ Camera::Camera(const int inWidth, const int inHeight,
     position = inPostition;
 }
 
-void Camera::Matrix(const float yFovDegree, const float aspect,
-  const float nearPlane, const float farPlane, Shader& shaderProgram,
-  const char* uniform) {
+void Camera::UpdateMatrix(const float yFovDegree, const float aspect,
+  const float nearPlane, const float farPlane) {
     // Initialize view and projection matrices
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 proj = glm::mat4(1.0f);
@@ -20,10 +19,14 @@ void Camera::Matrix(const float yFovDegree, const float aspect,
     proj = glm::perspective(glm::radians(yFovDegree), aspect, nearPlane,
       farPlane);
     
+    cameraMatrix = proj * view;
+}
+
+void Camera::SetUniform(Shader& shaderProgram, const char* uniform) {
     // Apply projection and view matrix to provided uniform for
     // vertex shader
     GLuint uniID = glGetUniformLocation(shaderProgram.GetID(), uniform);
-    glUniformMatrix4fv(uniID, 1, GL_FALSE, glm::value_ptr(proj * view));
+    glUniformMatrix4fv(uniID, 1, GL_FALSE, glm::value_ptr(cameraMatrix));
 }
 
 void Camera::Inputs(GLFWwindow* window) {

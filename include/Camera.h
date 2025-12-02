@@ -16,6 +16,7 @@ class Camera {
     glm::vec3 position;
     glm::vec3 orientation = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 upDirection = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 cameraMatrix = glm::mat4(1.0f);
 
     bool firstClick = true;
 
@@ -29,9 +30,9 @@ class Camera {
     Camera(const int inWidth, const int inHeight,
       const glm::vec3 inPostition);
     
-    void Matrix(const float yFovDegree, const float aspect,
-      const float nearPlane, const float farPlane, Shader& shaderProgram,
-      const char* uniform);
+    void UpdateMatrix(const float yFovDegree, const float aspect,
+      const float nearPlane, const float farPlane);
+    void SetUniform(Shader& shaderProgram, const char* uniform);
     void Inputs(GLFWwindow* window);
 };
 
