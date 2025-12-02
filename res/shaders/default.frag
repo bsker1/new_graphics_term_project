@@ -7,10 +7,11 @@ in vec2 texCoords;
 // Output variable
 out vec4 FragColor;
 
-// Texture uniform from main()
+// Uniforms from main()
 uniform sampler2D tex0;
+uniform vec4 lightColor;
 
 void main() {
   // Apply texture coordinate/color to pixel
-  FragColor = texture(tex0, texCoords);
+  FragColor = texture(tex0, texCoords) * lightColor;
 }

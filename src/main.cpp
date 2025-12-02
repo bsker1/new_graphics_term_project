@@ -159,6 +159,8 @@ int main(void) {
 
 
 
+  glm::vec4 lightColor = glm::vec4(1.0f, 0.2f, 0.5f, 1.0f);
+
   glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
   glm::mat4 lightModel = glm::mat4(1.0f);
   lightModel = glm::translate(lightModel, lightPos);
@@ -174,12 +176,20 @@ int main(void) {
     "model");
   glUniformMatrix4fv(uniLightModel, 1, GL_FALSE,
     glm::value_ptr(lightModel));
+  GLuint uniLightColor = glGetUniformLocation(lightShaderProgram.GetID(),
+    "lightColor");
+  glUniform4f(uniLightColor, lightColor.x, lightColor.y, lightColor.z,
+    lightColor.w);
 
   shaderProgram.Activate();
   GLuint uniPyramidModel = glGetUniformLocation(shaderProgram.GetID(),
     "model");
   glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE,
     glm::value_ptr(pyramidModel));
+  GLuint uniPyramidLightColor = glGetUniformLocation(shaderProgram.GetID(),
+    "lightColor");
+  glUniform4f(uniPyramidLightColor, lightColor.x, lightColor.y, lightColor.z,
+    lightColor.w);
 
 
   // Create camera object with screen resolution and starting position
