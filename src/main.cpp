@@ -132,10 +132,14 @@ int main(void) {
   ibo.Unbind();
 
   // Load planks image into OpenGL texture
-  std::string imgFilePath = RESOURCES_PATH "textures/planks.png";
-  Texture planks(imgFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
+  std::string texFilePath = RESOURCES_PATH "textures/planks.png";
+  Texture planksTex(texFilePath, GL_TEXTURE_2D, 0, GL_RGBA);
   // Apply value to tex0 uniform in fragment shader
-  planks.TexUnit(shaderProgram, "tex0", 0);
+  planksTex.TexUnit(shaderProgram, "tex0", 0);
+  std::string specMapFilePath = RESOURCES_PATH "textures/planksSpec.png";
+  Texture planksSpec(specMapFilePath, GL_TEXTURE_2D, 1, GL_RED);
+  planksSpec.TexUnit(shaderProgram, "tex1", 1);
+
 
 
 
@@ -218,8 +222,9 @@ int main(void) {
       camera.GetPosition().z);
     camera.SetMatrix(shaderProgram, "camMatrix");
 
-    // Bind brick texture
-    planks.Bind();
+    // Bind planks texture
+    planksTex.Bind();
+    planksSpec.Bind();
 
     // Bind vao with vertex/index values
     vao.Bind();
@@ -247,7 +252,8 @@ int main(void) {
   vao.Delete();
   vbo.Delete();
   ibo.Delete();
-  planks.Delete();
+  planksTex.Delete();
+  planksSpec.Delete();
   shaderProgram.Delete();
 
   // Cleanup GLFW window object
