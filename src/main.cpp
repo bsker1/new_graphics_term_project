@@ -178,7 +178,7 @@ int main(void) {
 
 
 
-  glm::vec4 lightColor = glm::vec4(1.0f, 0.6f, 0.9f, 1.0f);
+  glm::vec4 lightColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
 
   glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
   glm::mat4 lightModel = glm::mat4(1.0f);
@@ -233,6 +233,9 @@ int main(void) {
 
     // Select shader program
     shaderProgram.Activate();
+    GLuint uniCamPos = glGetUniformLocation(shaderProgram.GetID(), "camPos");
+    glUniform3f(uniCamPos, camera.GetPosition().x, camera.GetPosition().y,
+      camera.GetPosition().z);
     camera.SetMatrix(shaderProgram, "camMatrix");
 
     // Bind brick texture
