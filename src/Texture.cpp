@@ -2,7 +2,7 @@
 
 #include "stb/stb_image.h"
 
-Texture::Texture(const std::string imgFilePath, const GLenum texType, const GLenum slot, const GLenum format) {
+Texture::Texture(const std::string imgFilePath, const GLenum texType, const GLuint slot, const GLenum format) {
   // Assign texture type
   type = texType;
 
@@ -13,7 +13,8 @@ Texture::Texture(const std::string imgFilePath, const GLenum texType, const GLen
 
   // Assign provided texture to OpenGl texture
   glGenTextures(1, &id);
-  glActiveTexture(slot);
+  glActiveTexture(GL_TEXTURE0 + slot);
+  unit = slot;
   glBindTexture(texType, id);
 
   // Configure algorithm for resizing image
@@ -49,6 +50,7 @@ void Texture::TexUnit(Shader& shaderProgram, const char* uniform, const GLuint u
 }
 
 void Texture::Bind() {
+  glActiveTexture(GL_TEXTURE0 + unit);
   glBindTexture(type, id);
 }
 
