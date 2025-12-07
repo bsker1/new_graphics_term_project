@@ -19,7 +19,8 @@ void main() {
   vec3 lightDirection = normalize(lightPos - currPos);
 
   float diffuse = max(dot(normalizedNormal, lightDirection), 0.0f);
+  float ambient = 0.2f;
 
   // Apply texture coordinate/color to pixel
-  FragColor = texture(tex0, texCoords) * lightColor * diffuse;
+  FragColor = texture(tex0, texCoords) * lightColor * (diffuse + ambient);
 }
