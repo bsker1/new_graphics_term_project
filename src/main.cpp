@@ -27,49 +27,66 @@
 
 // Define pyramid vertices
 GLfloat vertices[] = {
-  -0.5f, 0.0f,  0.5f,    0.83f, 0.70f, 0.44f,      0.0f, 0.0f,
-   0.5f, 0.0f,  0.5f,    0.83f, 0.70f, 0.44f,      5.0f, 0.0f,
-   0.5f, 0.0f, -0.5f,    0.83f, 0.70f, 0.44f,      0.0f, 0.0f,
-  -0.5f, 0.0f, -0.5f,    0.83f, 0.70f, 0.44f,      5.0f, 0.0f,
-   0.0f, 0.8f,  0.0f,    0.92f, 0.86f, 0.76f,      2.5f, 5.0f
+  //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
 };
 
 // Define order to draw triangles
 GLuint indices[] = {
-  0, 1, 2,
-  2, 3, 0,
-  0, 1, 4,
-  1, 2, 4,
-  2, 3, 4,
-  3, 0, 4
+	0, 1, 2, // Bottom side
+	0, 2, 3, // Bottom side
+	4, 6, 5, // Left side
+	7, 9, 8, // Non-facing side
+	10, 12, 11, // Right side
+	13, 15, 14 // Facing side
 };
 
 
 
 GLfloat lightVertices[] = {
-  -0.1f, -0.1f,  0.1f,
-   0.1f, -0.1f,  0.1f,
-   0.1f, -0.1f, -0.1f,
-  -0.1f, -0.1f, -0.1f,
-  -0.1f,  0.1f,  0.1f,
-   0.1f,  0.1f,  0.1f,
-   0.1f,  0.1f, -0.1f,
-  -0.1f,  0.1f, -0.1f,
+  //     COORDINATES     //
+	-0.1f, -0.1f,  0.1f,
+	-0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f,  0.1f,
+	-0.1f,  0.1f,  0.1f,
+	-0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f,  0.1f
 };
 
 GLuint lightIndices[] = {
-  0, 1, 2,
-  2, 3, 0,
-  0, 1, 5,
-  5, 4, 0,
-  1, 2, 6,
-  6, 5, 1,
-  2, 3, 7,
-  7, 6, 2,
-  3, 0, 4,
-  4, 7, 3,
-  4, 5, 6,
-  6, 7, 4
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 7,
+	0, 7, 3,
+	3, 7, 6,
+	3, 6, 2,
+	2, 6, 5,
+	2, 5, 1,
+	1, 5, 4,
+	1, 4, 0,
+	4, 5, 6,
+	4, 6, 7
 };
 
 
@@ -121,11 +138,13 @@ int main(void) {
   IndexBuffer ibo(indices, sizeof(indices));
 
   // Apply vbo configuration to vao
-  vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float),
+  vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
+  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 11 * sizeof(float),
     (void*)(3 * sizeof(float)));
-  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float),
+  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 11 * sizeof(float),
     (void*)(6 * sizeof(float)));
+  vao.LinkAttrib(vbo, 3, 3, GL_FLOAT, 11 * sizeof(float),
+    (void*)(8 * sizeof(float)));
   
   // Unbind each object before program loop
   vao.Unbind();
@@ -159,13 +178,13 @@ int main(void) {
 
 
 
-  glm::vec4 lightColor = glm::vec4(1.0f, 0.2f, 0.5f, 1.0f);
+  glm::vec4 lightColor = glm::vec4(1.0f, 0.6f, 0.9f, 1.0f);
 
   glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
   glm::mat4 lightModel = glm::mat4(1.0f);
   lightModel = glm::translate(lightModel, lightPos);
 
-  glm::vec3 pyramidPos = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::mat4 pyramidModel = glm::mat4(1.0f);
   pyramidModel = glm::translate(pyramidModel, pyramidPos);
 
@@ -190,6 +209,9 @@ int main(void) {
     "lightColor");
   glUniform4f(uniPyramidLightColor, lightColor.x, lightColor.y, lightColor.z,
     lightColor.w);
+  GLuint uniPyramidLightPos = glGetUniformLocation(shaderProgram.GetID(),
+    "lightPos");
+  glUniform3f(uniPyramidLightPos, lightPos.x, lightPos.y, lightPos.z);
 
 
   // Create camera object with screen resolution and starting position
