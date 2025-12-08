@@ -12,24 +12,27 @@ out vec4 FragColor;
 // Uniforms from main()
 uniform sampler2D tex0;
 uniform sampler2D tex1;
-
 uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
 
 vec4 pointLight() {
+  // Calculate light intensity via 1/(ad^2 + bd + 1) equation
   vec3 lightVec = lightPos - currPos;
   float lightDistance = length(lightVec);
   float quadratic = 1.0f;
   float linear = 0.04f;
   float intensity = 1.0f / (quadratic * pow(lightDistance, 2) + linear * lightDistance + 1.0f);
 
+  // Calculate diffuse lighting
   vec3 normalizedNormal = normalize(normal);
   vec3 lightDirection = normalize(lightVec);
-
   float diffuse = max(dot(normalizedNormal, lightDirection), 0.0f);
+
+  // Define ambient lighting constant
   float ambient = 0.2f;
 
+  // Calculate specular lighting
   float maxSpecularLight = 0.5f;
   vec3 viewDirection = normalize(camPos - currPos);
   vec3 reflectionDirection = reflect(-lightDirection, normalizedNormal);
@@ -40,12 +43,15 @@ vec4 pointLight() {
 }
 
 vec4 directionalLight() {
+  // Calculate diffuse lighting
   vec3 normalizedNormal = normalize(normal);
   vec3 lightDirection = normalize(vec3(1.0f, 1.0f, 0.0f));
-
   float diffuse = max(dot(normalizedNormal, lightDirection), 0.0f);
+
+  // Define ambient lighting constant
   float ambient = 0.2f;
 
+  // Calculate specular lighting
   float maxSpecularLight = 0.5f;
   vec3 viewDirection = normalize(camPos - currPos);
   vec3 reflectionDirection = reflect(-lightDirection, normalizedNormal);
@@ -56,21 +62,26 @@ vec4 directionalLight() {
 }
 
 vec4 spotLight() {
+  // Define cone radii
   float cosOuterCone = 0.90f;
   float cosInnerCone = 0.95f;
 
+  // Calculate diffuse lighting
   vec3 normalizedNormal = normalize(normal);
   vec3 lightDirection = normalize(lightPos - currPos);
-
   float diffuse = max(dot(normalizedNormal, lightDirection), 0.0f);
+
+  // Define ambient lighting constant
   float ambient = 0.2f;
 
+  // Calculate specular lighting
   float maxSpecularLight = 0.5f;
   vec3 viewDirection = normalize(camPos - currPos);
   vec3 reflectionDirection = reflect(-lightDirection, normalizedNormal);
   float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
   float specular = specAmount * maxSpecularLight;
 
+  // Calculate light intensity
   float lightAngle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
   float intensity = clamp((lightAngle - cosOuterCone) / (cosInnerCone - cosOuterCone), 0.0f, 1.0f);
 
@@ -78,5 +89,5 @@ vec4 spotLight() {
 }
 
 void main() {
-  FragColor = spotLight();
+  FragColor = pointLight();
 }

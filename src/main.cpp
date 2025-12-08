@@ -25,7 +25,7 @@
 
 
 
-// Define pyramid vertices
+// Define floor vertices
 GLfloat vertices[] = {
 //     COORDINATES    /      COLORS       /  TexCoord   /      NORMALS     //
 	-1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
@@ -42,6 +42,7 @@ GLuint indices[] = {
 
 
 
+// Define light cube vertices
 GLfloat lightVertices[] = {
   //     COORDINATES     //
 	-0.1f, -0.1f,  0.1f,
@@ -54,6 +55,7 @@ GLfloat lightVertices[] = {
 	 0.1f,  0.1f,  0.1f
 };
 
+// Define order to draw triangles
 GLuint lightIndices[] = {
 	0, 1, 2,
 	0, 2, 3,
@@ -139,45 +141,57 @@ int main(void) {
 
 
 
+  // Generate shader program from light shader files
   std::string lightVertexPath = RESOURCES_PATH "shaders/light.vert";
   std::string lightFragmentPath = RESOURCES_PATH "shaders/light.frag";
   Shader lightShaderProgram(lightVertexPath, lightFragmentPath);
 
+  // Create vao
   VertexArray lightVAO;
   lightVAO.Bind();
 
+  // Create vbo and ibo, load with light vertices and indices respectively
   VertexBuffer lightVBO(lightVertices, sizeof(lightVertices));
   IndexBuffer lightIBO(lightIndices, sizeof(lightIndices));
 
+  // Apply vbo configuration to vao
   lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(GL_FLOAT), (void*)0);
   
+  // Unbind each object before program loop
   lightVAO.Unbind();
   lightVBO.Unbind();
   lightIBO.Unbind();
 
 
 
+  // Define light color
   glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+  // Define light cube position
   glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+  // Translate light cube model by position vector
   glm::mat4 lightModel = glm::mat4(1.0f);
   lightModel = glm::translate(lightModel, lightPos);
 
-  glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::mat4 pyramidModel = glm::mat4(1.0f);
-  pyramidModel = glm::translate(pyramidModel, pyramidPos);
+  // Define floor position
+  glm::vec3 floorPos = glm::vec3(0.0f, 0.0f, 0.0f);
+  // Translate floor model by position vector
+  glm::mat4 floorModel = glm::mat4(1.0f);
+  floorModel = glm::translate(floorModel, floorPos);
 
 
 
+  // Apply light model and color uniforms to light shader
   lightShaderProgram.Activate();
   GLuint uniLightModel = glGetUniformLocation(lightShaderProgram.GetID(), "model");
   glUniformMatrix4fv(uniLightModel, 1, GL_FALSE, glm::value_ptr(lightModel));
   GLuint uniLightColor = glGetUniformLocation(lightShaderProgram.GetID(), "lightColor");
   glUniform4f(uniLightColor, lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 
+  // Apply model, light color, and light position uniforms to default shader
   shaderProgram.Activate();
   GLuint uniPyramidModel = glGetUniformLocation(shaderProgram.GetID(), "model");
-  glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE, glm::value_ptr(pyramidModel));
+  glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE, glm::value_ptr(floorModel));
   GLuint uniPyramidLightColor = glGetUniformLocation(shaderProgram.GetID(), "lightColor");
   glUniform4f(uniPyramidLightColor, lightColor.x, lightColor.y, lightColor.z, lightColor.w);
   GLuint uniPyramidLightPos = glGetUniformLocation(shaderProgram.GetID(), "lightPos");
@@ -196,13 +210,16 @@ int main(void) {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Get user input for camera movement
     camera.Inputs(window);
     
+    // Apply view and projection matrices to camera for realistic 3D
     camera.UpdateMatrix(45.0f, RESOLUTION_X / (float)RESOLUTION_Y,
       0.1f, 100.0f);
 
-    // Select shader program
+    // Select default shader program
     shaderProgram.Activate();
+    // Apply camera position and view/projection matrices to shader uniforms
     GLuint uniCamPos = glGetUniformLocation(shaderProgram.GetID(), "camPos");
     glUniform3f(uniCamPos, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     camera.SetMatrix(shaderProgram, "camMatrix");
@@ -214,10 +231,12 @@ int main(void) {
     // Bind vao with vertex/index values
     vao.Bind();
 
-    // Draw pyramid
+    // Draw floor
     glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
     
+    // Select light shader program
     lightShaderProgram.Activate();
+    // Apply camera position and view/projection matrices to shader uniforms
     camera.SetMatrix(lightShaderProgram, "camMatrix");
     lightVAO.Bind();
     glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
