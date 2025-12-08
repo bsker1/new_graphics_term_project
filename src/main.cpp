@@ -86,8 +86,7 @@ int main(void) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Create a windowed mode window and its OpenGL context
-  window = glfwCreateWindow(RESOLUTION_X, RESOLUTION_Y,
-    "Graphics Term Project - Brandon Kiser", NULL, NULL);
+  window = glfwCreateWindow(RESOLUTION_X, RESOLUTION_Y, "Graphics Term Project - Brandon Kiser", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -119,12 +118,9 @@ int main(void) {
 
   // Apply vbo configuration to vao
   vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
-  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 11 * sizeof(float),
-    (void*)(3 * sizeof(float)));
-  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 11 * sizeof(float),
-    (void*)(6 * sizeof(float)));
-  vao.LinkAttrib(vbo, 3, 3, GL_FLOAT, 11 * sizeof(float),
-    (void*)(8 * sizeof(float)));
+  vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+  vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+  vao.LinkAttrib(vbo, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
   
   // Unbind each object before program loop
   vao.Unbind();
@@ -153,8 +149,7 @@ int main(void) {
   VertexBuffer lightVBO(lightVertices, sizeof(lightVertices));
   IndexBuffer lightIBO(lightIndices, sizeof(lightIndices));
 
-  lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(GL_FLOAT),
-    (void*)0);
+  lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(GL_FLOAT), (void*)0);
   
   lightVAO.Unbind();
   lightVBO.Unbind();
@@ -162,7 +157,7 @@ int main(void) {
 
 
 
-  glm::vec4 lightColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+  glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
   glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
   glm::mat4 lightModel = glm::mat4(1.0f);
@@ -175,26 +170,17 @@ int main(void) {
 
 
   lightShaderProgram.Activate();
-  GLuint uniLightModel = glGetUniformLocation(lightShaderProgram.GetID(),
-    "model");
-  glUniformMatrix4fv(uniLightModel, 1, GL_FALSE,
-    glm::value_ptr(lightModel));
-  GLuint uniLightColor = glGetUniformLocation(lightShaderProgram.GetID(),
-    "lightColor");
-  glUniform4f(uniLightColor, lightColor.x, lightColor.y, lightColor.z,
-    lightColor.w);
+  GLuint uniLightModel = glGetUniformLocation(lightShaderProgram.GetID(), "model");
+  glUniformMatrix4fv(uniLightModel, 1, GL_FALSE, glm::value_ptr(lightModel));
+  GLuint uniLightColor = glGetUniformLocation(lightShaderProgram.GetID(), "lightColor");
+  glUniform4f(uniLightColor, lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 
   shaderProgram.Activate();
-  GLuint uniPyramidModel = glGetUniformLocation(shaderProgram.GetID(),
-    "model");
-  glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE,
-    glm::value_ptr(pyramidModel));
-  GLuint uniPyramidLightColor = glGetUniformLocation(shaderProgram.GetID(),
-    "lightColor");
-  glUniform4f(uniPyramidLightColor, lightColor.x, lightColor.y, lightColor.z,
-    lightColor.w);
-  GLuint uniPyramidLightPos = glGetUniformLocation(shaderProgram.GetID(),
-    "lightPos");
+  GLuint uniPyramidModel = glGetUniformLocation(shaderProgram.GetID(), "model");
+  glUniformMatrix4fv(uniPyramidModel, 1, GL_FALSE, glm::value_ptr(pyramidModel));
+  GLuint uniPyramidLightColor = glGetUniformLocation(shaderProgram.GetID(), "lightColor");
+  glUniform4f(uniPyramidLightColor, lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+  GLuint uniPyramidLightPos = glGetUniformLocation(shaderProgram.GetID(), "lightPos");
   glUniform3f(uniPyramidLightPos, lightPos.x, lightPos.y, lightPos.z);
 
 
@@ -218,8 +204,7 @@ int main(void) {
     // Select shader program
     shaderProgram.Activate();
     GLuint uniCamPos = glGetUniformLocation(shaderProgram.GetID(), "camPos");
-    glUniform3f(uniCamPos, camera.GetPosition().x, camera.GetPosition().y,
-      camera.GetPosition().z);
+    glUniform3f(uniCamPos, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     camera.SetMatrix(shaderProgram, "camMatrix");
 
     // Bind planks texture
@@ -230,14 +215,12 @@ int main(void) {
     vao.Bind();
 
     // Draw pyramid
-    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint),
-      GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
     
     lightShaderProgram.Activate();
     camera.SetMatrix(lightShaderProgram, "camMatrix");
     lightVAO.Bind();
-    glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(GLuint),
-      GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
     // Swap front and back buffers
     glfwSwapBuffers(window);
