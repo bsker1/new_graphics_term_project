@@ -17,7 +17,7 @@ uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
 
-void main() {
+vec4 pointLight() {
   vec3 normalizedNormal = normalize(normal);
   vec3 lightDirection = normalize(lightPos - currPos);
 
@@ -30,6 +30,9 @@ void main() {
   float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
   float specular = specAmount * maxSpecularLight;
 
-  // Apply texture coordinate/color to pixel
-  FragColor = texture(tex0, texCoords) * lightColor * (diffuse + ambient) + texture(tex1, texCoords).r * specular;
+  return (texture(tex0, texCoords) * (diffuse + ambient) + texture(tex1, texCoords).r * specular) * lightColor;
+}
+
+void main() {
+  FragColor = pointLight();
 }
